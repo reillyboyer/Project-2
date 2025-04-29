@@ -1,28 +1,74 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Complaint Viewer</title>
+    <meta charset="UTF-8">
+    <title th:text="'Complaint #' + ${complaint.complaintId}">Complaint</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 2rem; line-height: 1.45; }
+        h1   { margin: 0 0 .75rem 0; }
+        nav a { margin-right: 1rem; }
+        .kv     { display: grid; grid-template-columns: max-content 1fr;
+                  gap: .25rem .75rem; margin-bottom: 1.5rem; }
+        .label  { font-weight: 600; }
+        .narrative { white-space: pre-line; margin-bottom: 1.5rem; }
+    </style>
 </head>
 <body>
-<h2>Complaint ID: <span th:text="${complaint.complaintId}"></span></h2>
-<p><strong>Company:</strong> <span th:text="${complaint.company}"></span></p>
-<p><strong>Narrative:</strong></p>
-<p th:text="${complaint.narrative}"></p>
 
-<hr/>
+<h1 th:text="'Complaint #' + ${complaint.complaintId}">Complaint #</h1>
 
-<h3>Top 3 Most Similar Complaints</h3>
-<ul>
-    <li th:each="similar : ${similarComplaints}">
-        <p><strong>ID:</strong> <span th:text="${similar.complaintId}"></span></p>
-        <p><strong>Company:</strong> <span th:text="${similar.company}"></span></p>
-        <p th:text="${similar.narrative}"></p>
-    </li>
-</ul>
+<form method="get" action="/complaint" style="margin:1rem 0">
+    <label for="indexInput">Jump to complaint #:</label>
+    <input  type="text" name="index" id="indexInput"
+            size="6" autocomplete="off"
+            th:value="${index}"/>  
+    <button type="submit">Go</button>
+  </form>
 
-<hr/>
-<a th:href="@{|/complaint?index=${prevIndex}|}">⬅ Previous</a> |
-<a th:href="@{|/complaint?index=${nextIndex}|}">Next ➡</a>
+  <form action="/search" method="get" style="margin-bottom:1.5rem">
+    <button type="submit">🔍 Search by Company</button>
+</form>
+
+  <p th:if="${error}" th:text="${error}" style="color:red"></p>
+
+<nav>
+    <a th:href="'/complaint?index=' + ${prevIndex}">Previous</a>
+    <a th:href="'/complaint?index=' + ${nextIndex}">Next</a>
+</nav>
+
+<!-- Details grid -->
+<section class="kv">
+    <span class="label">Date received:</span>  <span th:text="${complaint.dateReceivedStr}"></span>
+    <span class="label">Product:</span>        <span th:text="${complaint.product}"></span>
+    <span class="label">Sub-product:</span>    <span th:text="${complaint.subProduct}"></span>
+    <span class="label">Issue:</span>          <span th:text="${complaint.issue}"></span>
+    <span class="label">Sub-issue:</span>      <span th:text="${complaint.subIssue}"></span>
+    <span class="label">Company response:</span>
+                                              <span th:text="${complaint.publicResponse}"></span>
+    <span class="label">Company response to consumer:</span>
+                                              <span th:text="${complaint.companyResponse}"></span>
+    <span class="label">Company:</span>        <span th:text="${complaint.company}"></span>
+    <span class="label">State:</span>          <span th:text="${complaint.state}"></span>
+    <span class="label">ZIP:</span>            <span th:text="${complaint.zipCode}"></span>
+</section>
+
+<!-- Narrative -->
+<section>
+    <h2>Narrative</h2>
+    <p class="narrative" th:text="${complaint.narrative}"></p>
+</section>
+
+<!-- Similar complaints -->
+<section>
+    <h2>Similar complaints</h2>
+    <ul>
+        <li th:each="row : ${similarRows}">
+            <a th:href="'/complaint?index=' + ${row.index}"
+               th:text="'Complaint #' + ${row.complaint.complaintId} + ' — ' + ${row.complaint.company}">
+            </a>
+        </li>
+    </ul>
+</section>
 
 </body>
 </html>

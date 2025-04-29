@@ -2,25 +2,34 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Search Results</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 2rem; line-height: 1.45; }
+        h1  { margin-bottom: 1rem; }
+        .error { color: crimson; }
+        ul   { padding-left: 1.2rem; }
+        li   { margin-bottom: .5rem; }
+    </style>
 </head>
 <body>
+
 <h1>🔍 Search Complaints by Company</h1>
 
-<form method="get" action="/search">
-    <input type="text" name="company" placeholder="Enter company name..." th:value="${companySearch}" />
+<form method="get" action="/search" style="margin-bottom:1rem">
+    <input type="text" name="company" placeholder="Enter company name..."
+           th:value="${companySearch}" size="30" autocomplete="off"/>
     <button type="submit">Search</button>
 </form>
 
-<p th:if="${error != null}" th:text="${error}" style="color: red;"></p>
+<p th:if="${error}" th:text="${error}" class="error"></p>
 
-<ul th:if="${searchResults != null}">
-    <li th:each="complaint : ${searchResults}">
-        <strong th:text="'Complaint ID: ' + ${complaint.complaintId}"></strong> —
-        <span th:text="${complaint.narrative}"></span>
+<ul th:if="${searchResults}">
+    <li th:each="row : ${searchResults}">
+        <a th:href="'/complaint?index=' + ${row.index}"
+           th:text="'Complaint #' + ${row.complaint.complaintId}"></a>
+        — <span th:text="${row.complaint.narrative}"></span>
     </li>
 </ul>
 
 <a href="/complaint">Back to Viewer</a>
 </body>
 </html>
-
